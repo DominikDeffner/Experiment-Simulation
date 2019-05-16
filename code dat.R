@@ -14,8 +14,9 @@ dat$group_id <- dat$group.id
 dat$group.id <- NULL
 
 # prep id's
-dat$uid <- (dat$Session_ID - 1)*8 + dat$id
-dat$N_id <- max(dat$uid)
+dat$sid <- dat$id
+dat$id <- (dat$Session_ID - 1)*8 + dat$id
+dat$N_id <- max(dat$id)
 dat$N <- nrow(Result)
 
 nmat <- cbind( dat$n1 , dat$n2 , dat$n3 , dat$n4 )
@@ -36,3 +37,5 @@ m0 <- stan( file="ewa_model1.stan" , data=dat , chains=1 )
 m1 <- stan( file="ewa_model2.stan" , data=dat , chains=1 )
 
 m2 <- stan( file="ewa_model3.stan" , data=dat , chains=1 )
+
+m3 <- stan( file="ewa_model4.stan" , data=dat , chains=1 )
