@@ -1,4 +1,5 @@
 
+#Here we add individual variation and make sigma a function of experience
 
 # Simple social learning experiment with migration
 # use simple reinforcement recursion:
@@ -36,11 +37,11 @@ library(scales)
    
    #Assign individual-specific parameter values to include some variation
    
-   Homunculi$L <-     rtruncnorm(8, a=0, b=+Inf, mean=L, sd=0.02) 
-   Homunculi$phi <-   rtruncnorm(8, a=0, b=1, mean=phi, sd=0.05)
-   Homunculi$sigma <- rtruncnorm(8, a=0, b=1, mean=sigma, sd=0.05)
-   Homunculi$f <-     rtruncnorm(8, a=0, b=+Inf, mean=f, sd=0.01)
-   Homunculi$b <-     rtruncnorm(8, a=-Inf, b=+Inf, mean=b, sd=0.01)
+   Homunculi$L <-     rtruncnorm(8, a=0, b=+Inf, mean=L, sd=0.05) 
+   Homunculi$phi <-   rtruncnorm(8, a=0, b=1, mean=phi, sd=0.1)
+   Homunculi$sigma <- rtruncnorm(8, a=0, b=1, mean=sigma, sd=0.1)
+   Homunculi$f <-     rtruncnorm(8, a=0, b=+Inf, mean=f, sd=1)
+   Homunculi$b <-     rtruncnorm(8, a=-Inf, b=+Inf, mean=b, sd=0.1)
    
    
    #Create output matrix to record choices and payoffs participants received and Attraction scores at each point in time
@@ -119,6 +120,8 @@ library(scales)
        L_Ind <-     Homunculi$L[which(Homunculi$id==x)]
        
        
+       
+       
        #Record group_id in output matrix
        Result$group.id[which(Result$id==x & Result$trial==i)] <- Homunculi$Group[which(Homunculi$id==x)]
        
@@ -151,6 +154,10 @@ library(scales)
        
 
          
+       # Make sigma change with experience in group
+       
+       sigma_Ind <- sigma_Ind*exp(-0.1 * Result$Experience[which(Result$id==x & Result$trial==i)]-1)
+       
        
        #Get other current group members
        Group_members <- Homunculi$id[which(Homunculi$Group == Homunculi$Group[which(Homunculi$id == x)] & Homunculi$id != x)]
@@ -365,7 +372,7 @@ library(scales)
  Result <- Sim_fct(Tmax=100,               #Number of trials
                    Group_size=4,
                    N_group=2,
-                   N_sessions=15,
+                   N_sessions=5,
                    L=0.2,                   #Noise of coices, impact determined by size of payoff
                    Payoff_Better=15,
                    Payoff_Worse=10,
