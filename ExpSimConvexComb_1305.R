@@ -156,7 +156,7 @@ library(scales)
          
        # Make sigma change with experience in group
        
-       sigma_Ind <- sigma_Ind*exp(-0.1 * Result$Experience[which(Result$id==x & Result$trial==i)]-1)
+       sigma_Ind <- sigma_Ind*exp(-0 * (Result$Experience[which(Result$id==x & Result$trial==i)]-1))
        
        
        #Get other current group members
