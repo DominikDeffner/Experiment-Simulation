@@ -120,7 +120,7 @@ model{
       pS = pS / sum(pS);
 
       // combine everything
-      sigma = inv_logit( logit_sigma_a[Experience[i]] + v_sigma[id[i],Experience[i]]);
+      sigma = inv_logit(logit_sigma_a[Experience[i]] + v_sigma[id[i],Experience[i]]);
 
       p = (1-sigma)*pA + sigma*( (1-kappa)*pC + kappa*pS );
 

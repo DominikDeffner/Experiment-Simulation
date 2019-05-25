@@ -39,7 +39,7 @@ library(scales)
    
    Homunculi$L <-     rtruncnorm(8, a=0, b=+Inf, mean=L, sd=0.05) 
    Homunculi$phi <-   rtruncnorm(8, a=0, b=1, mean=phi, sd=0.1)
-   Homunculi$sigma <- rtruncnorm(8, a=0, b=1, mean=sigma, sd=0.1)
+   Homunculi$sigma <- rtruncnorm(8, a=0, b=1, mean=sigma, sd=0)
    Homunculi$f <-     rtruncnorm(8, a=0, b=+Inf, mean=f, sd=1)
    Homunculi$b <-     rtruncnorm(8, a=-Inf, b=+Inf, mean=b, sd=0.1)
    
@@ -156,7 +156,7 @@ library(scales)
          
        # Make sigma change with experience in group
        
-       sigma_Ind <- sigma_Ind*exp(-0 * (Result$Experience[which(Result$id==x & Result$trial==i)]-1))
+       sigma_Ind <- sigma_Ind*exp(-1 * (Result$Experience[which(Result$id==x & Result$trial==i)]-1))
        
        
        #Get other current group members
@@ -264,16 +264,16 @@ library(scales)
        } else {
          
          Prob_1 <- (1-sigma_Ind) * (exp(L_Ind*Homunculi$A1[which(Homunculi$id==x)]))/ Sum_Attr +
-                      sigma_Ind  * (1-kappa) * pConf1 + kappa * pAge1
+                      sigma_Ind  * ((1-kappa) * pConf1 + kappa * pAge1)
          
          Prob_2 <- (1-sigma_Ind) * (exp(L_Ind*Homunculi$A2[which(Homunculi$id==x)]))/ Sum_Attr +
-                     sigma_Ind  * (1-kappa) * pConf2 + kappa * pAge2
+                     sigma_Ind  * ((1-kappa) * pConf2 + kappa * pAge2)
 
          Prob_3 <- (1-sigma_Ind) * (exp(L_Ind*Homunculi$A3[which(Homunculi$id==x)]))/ Sum_Attr +
-                    sigma_Ind  * (1-kappa) * pConf3 + kappa * pAge3           
+                    sigma_Ind  * ((1-kappa) * pConf3 + kappa * pAge3)           
            
          Prob_4 <- (1-sigma_Ind) * (exp(L_Ind*Homunculi$A4[which(Homunculi$id==x)]))/ Sum_Attr +
-                    sigma_Ind  * (1-kappa) * pConf4 + kappa * pAge4
+                    sigma_Ind  * ((1-kappa) * pConf4 + kappa * pAge4)
            
        }
        
@@ -372,18 +372,17 @@ library(scales)
  Result <- Sim_fct(Tmax=100,               #Number of trials
                    Group_size=4,
                    N_group=2,
-                   N_sessions=5,
+                   N_sessions=15,
                    L=0.2,                   #Noise of coices, impact determined by size of payoff
                    Payoff_Better=15,
                    Payoff_Worse=10,
                    Hard_SD = 2,
                    Easy_SD = 0.5,                   
-                   phi=0.4,                 #Updating parameter; weight of recent choices
+                   phi=0.5,                 #Updating parameter; weight of recent choices
                    sigma=0.5,               #Reliance on SL
-                   kappa=0.7,                 #Relative weight of comformity and age bias, as kappa -> 1 more weight on conformity
-                   f=2,                     #strength of conformity bias
-                   b=0.3)                     #strength of age bias
+                   kappa=0.6,                 #Relative weight of comformity and age bias, as kappa -> 1 more weight on conformity
+                   f=3,                     #strength of conformity bias
+                   b=0.2)                     #strength of age bias
 
  
 
- 

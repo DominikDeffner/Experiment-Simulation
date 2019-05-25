@@ -18,7 +18,7 @@ library(rethinking) # for utilities
 library(Rlab)
 
  Sim_fct <- function(Tmax, Group_size, N_group, N_sessions, L, Payoff_Better, Payoff_Worse, Hard_SD = 2,
-                     Easy_SD = 0.5, phi,sigma, delta, f, b){
+                     Easy_SD = 0.5, phi,sigma, f, b){
  
  #Create big output matrix
  Result_Overall <- c()
@@ -36,7 +36,7 @@ library(Rlab)
    
    Homunculi$L <-     rtruncnorm(8, a=0, b=+Inf, mean=L, sd=0.02) 
    Homunculi$phi <-   rtruncnorm(8, a=0, b=1, mean=phi, sd=0.05)
-   Homunculi$sigma <- rtruncnorm(8, a=0, b=1, mean=sigma, sd=0.05)
+   Homunculi$sigma <- sigma#rtruncnorm(8, a=0, b=1, mean=sigma, sd=0.05)
    Homunculi$f <-     rtruncnorm(8, a=0, b=+Inf, mean=f, sd=0.01)
    Homunculi$b <-     rtruncnorm(8, a=-Inf, b=+Inf, mean=b, sd=0.01)
    
@@ -353,16 +353,15 @@ library(Rlab)
                    Group_size=4,
                    N_group=2,
                    N_sessions=10,
-                   L=0.5,                   #Noise of coices, impact determined by size of payoff
+                   L=0.2,                   #Noise of coices, impact determined by size of payoff
                    Payoff_Better=15,
                    Payoff_Worse=10,
                    Hard_SD = 2,
                    Easy_SD = 0.5,                   
                    phi=0.4,                 #Updating parameter; weight of recent choices
-                   sigma=0.2,               #Reliance on SL
-                   delta=0.5,                 #Relative weight of comformity and age bias, as delta -> 1 more weight on conformity
+                   sigma=0,               #Reliance on SL
                    f=2,                     #strength of conformity bias
-                   b=2)                     #strength of age bias
+                   b=0.3)                     #strength of age bias
 
  
 
