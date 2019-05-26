@@ -29,8 +29,8 @@ data{
 }
 
 parameters{
-  real<lower=0,upper=1> phi; //mean phi
-  real<lower=0> L; //mean L
+  real logit_phi; //mean phi
+  real log_L; //mean L
 
   vector[20] logit_sigma; // mean logit weight of social learning for each level of experience
 
@@ -55,8 +55,8 @@ model{
 
   matrix[N_id,4] A; // attraction matrix
 
-  phi ~ beta(2,2);
-  L ~ exponential(1);
+  logit_phi ~ normal(0,1);
+  log_L ~ normal(0,1);
   logit_sigma ~ normal(0,1);
   f ~ normal(1,0.5);
   kappa ~ beta(2,2);
@@ -81,12 +81,15 @@ model{
     vector[4] pS;
     vector[4] p;
     real sigma;
+    real phi;
+    real L;
 
     if ( new_farm[i]==1 ) A[id[i],1:4] = rep_vector(0,4)';
 
     // first, what is log-prob of observed choice
 
-    pA = softmax( (L + v_ind[id[i],22]) * A[id[i],1:4]' );
+    L = exp((log_L + v_ind[id[i],22]));
+    pA = softmax( L * A[id[i],1:4]' );
 
     // second compute conformity thing
 
@@ -128,10 +131,12 @@ model{
 
     // second, update attractions conditional on observed choice
 
+    phi = inv_logit(logit_phi + v_ind[id[i],21]);
+
     pay[1:4] = rep_vector(0,4);
     pay[ Choice[i] ] = Payoff[i];
-    A[ id[i] , 1:4 ] = ( (1- (phi + v_ind[id[i],21]) * to_vector(A[ id[i] , 1:4 ]) + (phi + v_ind[id[i],21]) * pay))';
 
+    A[ id[i] , 1:4 ] = ( (1-phi)*to_vector(A[ id[i] , 1:4 ]) + phi*pay)';
 
   }
   //i

@@ -14,10 +14,8 @@
 # As L -> 0, choice becomes noisy.
 # for utilities
 library(rethinking) 
-library(Rlab)
 library(parallel)
 library(truncnorm)
-library(scales)
 `%not in%` <- function (x, table) is.na(match(x, table, nomatch=NA_integer_))
 
 
@@ -37,9 +35,9 @@ library(scales)
    
    #Assign individual-specific parameter values to include some variation
    
-   Homunculi$L <-     rtruncnorm(8, a=0, b=+Inf, mean=L, sd=0.05) 
-   Homunculi$phi <-   rtruncnorm(8, a=0, b=1, mean=phi, sd=0.1)
-   Homunculi$sigma <- rtruncnorm(8, a=0, b=1, mean=sigma, sd=0)
+   Homunculi$L <-     rtruncnorm(8, a=0, b=+Inf, mean=L, sd=0.5) 
+   Homunculi$phi <-   rtruncnorm(8, a=0, b=1, mean=phi, sd=0.5)
+   Homunculi$sigma <- rtruncnorm(8, a=0, b=1, mean=sigma, sd=0.1)
    Homunculi$f <-     rtruncnorm(8, a=0, b=+Inf, mean=f, sd=1)
    Homunculi$b <-     rtruncnorm(8, a=-Inf, b=+Inf, mean=b, sd=0.1)
    
@@ -156,7 +154,7 @@ library(scales)
          
        # Make sigma change with experience in group
        
-       sigma_Ind <- sigma_Ind*exp(-1 * (Result$Experience[which(Result$id==x & Result$trial==i)]-1))
+       sigma_Ind <- sigma_Ind*exp(-0.1 * (Result$Experience[which(Result$id==x & Result$trial==i)]-1))
        
        
        #Get other current group members
@@ -372,12 +370,12 @@ library(scales)
  Result <- Sim_fct(Tmax=100,               #Number of trials
                    Group_size=4,
                    N_group=2,
-                   N_sessions=15,
+                   N_sessions=5,
                    L=0.2,                   #Noise of coices, impact determined by size of payoff
-                   Payoff_Better=15,
+                   Payoff_Better=13,
                    Payoff_Worse=10,
-                   Hard_SD = 2,
-                   Easy_SD = 0.5,                   
+                   Hard_SD = 3,
+                   Easy_SD = 1.5,                   
                    phi=0.5,                 #Updating parameter; weight of recent choices
                    sigma=0.5,               #Reliance on SL
                    kappa=0.6,                 #Relative weight of comformity and age bias, as kappa -> 1 more weight on conformity
