@@ -1,6 +1,8 @@
 # code data
 
-setwd("C:/Users/dominik_deffner/Documents/GitHub/Experiment-Simulation")
+setwd("C:/Users/dominik_deffner/Documents/GitHub/Experiment-Simulation")  #MPI
+
+setwd("C:/Users/Dominik/Documents/GitHub/Experiment-Simulation")   #Laptop
 
 dat <- as.list(Result)
 dat$farm <- as.integer( ceiling( dat$trial / 25 ) )
@@ -45,6 +47,8 @@ m2 <- stan( file="ewa_model3.stan" , data=dat , chains=1, iter = 500 )
 m3 <- stan( file="ewa_model4.stan" , data=dat , chains=1, iter = 500 )
 
 m5 <- stan( file="ewa_model5.stan" , data=dat , chains=1, iter = 500 )
+
+m6 <- stan( file="ewa_model6.stan" , data=dat , chains=1, iter = 500 )
 
 sum <- precis(m5, depth = 3)
 plot(inv_logit(sum$mean[3:22]), type="l", ylim=c(0,1), ylab=expression(sigma), xlab="Experience", lwd=2)
