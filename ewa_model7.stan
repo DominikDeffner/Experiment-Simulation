@@ -73,9 +73,9 @@ rhosq ~ exponential( 0.5 );
 etasq ~ exponential( 2 );
 
 
-dev_sigma ~ multi_normal( rep_vector(0,20) , Kmat );
 
 Kmat = cov_GPL2(expmat, etasq, rhosq, 0.01);
+dev_sigma ~ multi_normal( rep_vector(0,20) , Kmat );
 
 
 // initialize attraction scores
