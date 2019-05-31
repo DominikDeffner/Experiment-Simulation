@@ -57,7 +57,10 @@ m5 <- stan( file="ewa_model5.stan" , data=dat , chains=1, iter = 500 )
 
 m6 <- stan( file="ewa_model6.stan" , data=dat , chains=1, iter = 1000 )
 
-m7 <- stan( file="ewa_model7.stan" , data=dat , chains=1, iter = 500 )
+m7 <- stan( file="ewa_model7.stan" , data=dat , chains=1, iter = 1000 )
+
+m8 <- stan( file="ewa_model8.stan" , data=dat , chains=1, iter = 1000 )
+
 
 
 sum <- precis(m6, depth = 3)
