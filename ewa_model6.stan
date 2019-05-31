@@ -33,12 +33,17 @@ parameters{
   real log_L; //mean L
 
   vector[20] logit_sigma; // mean logit weight of social learning for each level of experience
+  vector[20] beta;        // strength of age bias for each level of experience
+  vector<lower=0>[20] f; // strength of conformity for each level of experience
+  vector<lower=0,upper=1>[20] kappa; // weight of age bias for each level of experience
 
-  real<lower=0> f; // strength of conformity
-  real<lower=0,upper=1> kappa; // weight of age bias
-  real beta; // strength of age bias
 
   // varying effects clustered on individual
+  // [1:20] logit_sigma
+  // [21] logit_phi
+  // [22] log_L
+  // [23:42] beta
+
     matrix[22,N_id] z_ind;
     vector<lower=0>[22] sigma_ind; // standard deviation of parameter values among individuals
     cholesky_factor_corr[22] L_Rho_ind;
@@ -89,6 +94,7 @@ model{
     // first, what is log-prob of observed choice
 
     L = exp((log_L + v_ind[id[i],22]));
+
     pA = softmax( L * A[id[i],1:4]' );
 
     // second compute conformity thing
@@ -100,7 +106,7 @@ model{
 
       // conformity
 
-      for ( j in 1:4 ) pC[j] = nmat[i,j]^f;
+      for ( j in 1:4 ) pC[j] = nmat[i,j]^f[Experience[i]];
 
       pC = pC / sum(pC);
 
@@ -113,7 +119,7 @@ model{
         for ( a_model in 1:3 ) {
 
           if ( choice_models[i,a_model]==an_option )
-          pS[an_option] = pS[an_option] + exp(beta*age_models[i,a_model]);
+          pS[an_option] = pS[an_option] + exp(beta[Experience[i]]  * age_models[i,a_model]);
 
         }
       }
@@ -123,7 +129,7 @@ model{
       // combine everything
       sigma = inv_logit(logit_sigma[Experience[i]] + v_ind[id[i],Experience[i]]);
 
-      p = (1-sigma)*pA + sigma*( (1-kappa)*pC + kappa*pS );
+      p = (1-sigma)*pA + sigma*( (1-kappa[Experience[i]])*pC + kappa[Experience[i]]*pS );
 
     }
 
