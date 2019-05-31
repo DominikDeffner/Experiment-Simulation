@@ -3,17 +3,17 @@
 
 functions{
 
-    matrix cov_GPL2(matrix x, real sq_alpha, real sq_rho, real delta) {
+    matrix cov_GPL2(matrix x, real sq_alpha, real sq_rho, real sq_sigma) {
         int N = dims(x)[1];
         matrix[N, N] K;
         for (i in 1:(N-1)) {
-          K[i, i] = sq_alpha + delta;
+          K[i, i] = sq_alpha + sq_sigma;
           for (j in (i + 1):N) {
             K[i, j] = sq_alpha * exp(-sq_rho * square(x[i,j]) );
             K[j, i] = K[i, j];
           }
         }
-        K[N, N] = sq_alpha + delta;
+        K[N, N] = sq_alpha + sq_sigma;
         return K;
     }
 }
@@ -53,8 +53,10 @@ vector[20] dev_sigma;
 real<lower=0> f;                    // strength of conformity
 real<lower=0,upper=1> kappa;    // weight of age bias
 real beta;                         // strength of age bias
-real<lower=0> etasq; // max covariance in Gaussian process
+<lower=0> etasq; // max covariance in Gaussian process
 real<lower=0> rhosq; // rate of decline
+real<lower=0> sigmasq; // additional variance of main diagonal
+
 }
 
 model{
@@ -65,16 +67,15 @@ matrix[20,20] Kmat; // Covariance matrix for parameters
 mean_sigma ~ normal(0,1);
 phi ~ beta(2,2);
 L ~ exponential(1);
-//sigma ~ beta(2,2);
 f ~ normal(1,0.5);
 kappa ~ beta(2,2);
 beta ~ normal(0,0.5);
 rhosq ~ exponential( 0.5 );
 etasq ~ exponential( 2 );
+sigmasq ~ exponential(2);
 
 
-
-Kmat = cov_GPL2(expmat, etasq, rhosq, 0.01);
+Kmat = cov_GPL2(expmat, etasq, rhosq, sigmasq);
 dev_sigma ~ multi_normal( rep_vector(0,20) , Kmat );
 
 

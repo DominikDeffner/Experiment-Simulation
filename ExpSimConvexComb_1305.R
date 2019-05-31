@@ -19,7 +19,7 @@ library(truncnorm)
 `%not in%` <- function (x, table) is.na(match(x, table, nomatch=NA_integer_))
 
 
- Sim_fct <- function(Tmax, Group_size, N_group, N_sessions, L, Payoff_Better, Payoff_Worse, Hard_SD = 2,Easy_SD = 0.5, phi,sigma, kappa, f, b){
+ Sim_fct <- function(Tmax, Group_size, N_group, N_sessions, L, Payoff_Better, Payoff_Worse, Hard_SD,Easy_SD, phi,sigma, kappa, f, b){
 
  #Create big output matrix
  Result_Overall <- c()
@@ -38,7 +38,7 @@ library(truncnorm)
    Homunculi$L <-     rtruncnorm(8, a=0, b=+Inf, mean=L, sd=0.05)
    Homunculi$phi <-   rtruncnorm(8, a=0, b=1, mean=phi, sd=0.1)
    Homunculi$sigma <- rtruncnorm(8, a=0, b=1, mean=sigma, sd=0.1)
-   Homunculi$f <-     rtruncnorm(8, a=0, b=+Inf, mean=f, sd=1)
+   Homunculi$f <-     rtruncnorm(8, a=0, b=+Inf, mean=f, sd=0.5)
    Homunculi$b <-     rtruncnorm(8, a=-Inf, b=+Inf, mean=b, sd=0.1)
 
 

@@ -1,8 +1,8 @@
 # code data
 
-setwd("C:/Users/dominik_deffner/Documents/GitHub/Experiment-Simulation")  #MPI
+#setwd("C:/Users/dominik_deffner/Documents/GitHub/Experiment-Simulation")  #MPI
 
-#setwd("C:/Users/Dominik/Documents/GitHub/Experiment-Simulation")   #Laptop
+setwd("C:/Users/Dominik/Documents/GitHub/Experiment-Simulation")   #Laptop
 
 dat <- as.list(Result)
 dat$farm <- as.integer( ceiling( dat$trial / 25 ) )
@@ -34,6 +34,13 @@ dat$nmat <- nmat
 dat$choice_models <- choice_models
 dat$age_models <- age_models
 
+dat$expmat <- matrix(nrow = 20, ncol = 20)
+for (i in 1:20) {
+  for (j in 1:20) {
+    dat$expmat[i,j] <- abs(i-j) 
+  }
+}
+
 library(rethinking)
 library(scales)
 
@@ -49,6 +56,9 @@ m3 <- stan( file="ewa_model4.stan" , data=dat , chains=1, iter = 500 )
 m5 <- stan( file="ewa_model5.stan" , data=dat , chains=1, iter = 500 )
 
 m6 <- stan( file="ewa_model6.stan" , data=dat , chains=1, iter = 1000 )
+
+m7 <- stan( file="ewa_model7.stan" , data=dat , chains=1, iter = 500 )
+
 
 sum <- precis(m6, depth = 3)
 plot(inv_logit(sum$mean[3:22]), type="l", ylim=c(0,1), ylab=expression(sigma), xlab="Experience", lwd=2)
