@@ -1,8 +1,7 @@
 
-// Attempt at simplest Gaussian process
+//Try to add varying effects on GP
 
 functions{
-
     matrix cov_GPL2(matrix x, real sq_alpha, real sq_rho, real sq_sigma) {
         int N = dims(x)[1];
         matrix[N, N] K;
@@ -48,22 +47,42 @@ matrix[N,3] choice_models;
 parameters{
 real<lower=0,upper=1> phi;
 real<lower=0> L;
-real mean_sigma;           //mean weight of social info
-vector[20] dev_sigma;
 real<lower=0> f;                    // strength of conformity
 real<lower=0,upper=1> kappa;    // weight of age bias
 real beta;                         // strength of age bias
-real<lower=0> etasq; // max covariance in Gaussian process
-real<lower=0> rhosq; // rate of decline
-real<lower=0> sigmasq; // additional variance of main diagonal
+
+real mean_sigma; // mean weight of social info for average level of experience
+
+//Gaussian process stuff
+real etasq;   // max covariance in Gaussian process
+real rhosq;   // rate of decline
+real sigmasq; // additional variance of main diagonal
+
+// Varying effects clustered on individual
+matrix[4,N_id] z_GP;
+
+//[1,] mean_sigma : mean weight of social info
+//[2,] etasq: max covariance in Gaussian process
+//[3,] rhosq: rate of decline
+//[4,] sigmasq: additional variance of main diagonal
+
+vector<lower=0>[4] sigma_ID;       //SD of parameters among individuals
+cholesky_factor_corr[4] Rho_ID;
 
 }
 
+transformed parameters{
+
+  matrix[N_id,4] v_GP; // varying effects on stuff
+
+  v_GP = ( diag_pre_multiply( sigma_ID , Rho_ID ) * z_GP )';
+}
+
 model{
+matrix[N_id, 20] dev_sigma;         // Average deviations for levels of experience
 
 matrix[N_id,4] A; // attraction matrix
-matrix[20,20] Kmat; // Covariance matrix for parameters
-int N_mat;
+matrix[20, 20] Kmat[N_id];
 
 mean_sigma ~ normal(0,1);
 phi ~ beta(2,2);
@@ -75,22 +94,15 @@ rhosq ~ exponential( 0.5 );
 etasq ~ exponential( 2 );
 sigmasq ~ exponential(2);
 
-//Gaussian process fun
+//varying effects
+to_vector(z_GP) ~ normal(0,1);
+sigma_ID ~ exponential(1);
+Rho_ID ~ lkj_corr_cholesky(4);
 
-N_mat = dims(expmat)[1];
-
-for (i in 1:(N_mat-1)) {
-  Kmat[i, i] = sq_alpha + 0.01;
-  for (j in (i + 1):N_mat) {
-    Kmat[i, j] = sq_alpha * exp(-sq_rho * square(expmat[i,j]) );
-    Kmat[j, i] = Kmat[i, j];
-  }
+for ( i in 1:N_id) {
+    Kmat[i] = cov_GPL2(expmat, (etasq + v_GP[i,2]) , (rhosq + v_GP[i,3]), (sigmasq + v_GP[i,4]));
+    dev_sigma[i,] ~ multi_normal( rep_vector(0,20) , Kmat[i]);
 }
-Kmat[N_mat, N_mat] = sq_alpha + 0.01;
-
-//Kmat = cov_GPL2(expmat, etasq, rhosq, 0.01);
-dev_sigma ~ multi_normal( rep_vector(0,20) , Kmat);
-
 
 // initialize attraction scores
 
@@ -143,8 +155,8 @@ pS[an_option] = pS[an_option] + exp(beta*age_models[i,a_model]);
 pS = pS / sum(pS);
 
 // combine everything
-
-sigma = inv_logit(mean_sigma + dev_sigma[Experience[i]]);
+// First part adds person-specific deviation to global mean sigma
+sigma = inv_logit((mean_sigma + v_GP[id[i],1]) + dev_sigma[id[i], Experience[i]]);
 
 p = (1-sigma)*pA + sigma*( (1-kappa)*pC + kappa*pS );
 

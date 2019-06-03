@@ -1,8 +1,8 @@
 # code data
 
-setwd("C:/Users/dominik_deffner/Documents/GitHub/Experiment-Simulation")  #MPI
+#setwd("C:/Users/dominik_deffner/Documents/GitHub/Experiment-Simulation")  #MPI
 
-#setwd("C:/Users/Dominik/Documents/GitHub/Experiment-Simulation")   #Laptop
+setwd("C:/Users/Dominik/Documents/GitHub/Experiment-Simulation")   #Laptop
 
 dat <- as.list(Result)
 dat$farm <- as.integer( ceiling( dat$trial / 25 ) )
@@ -34,14 +34,12 @@ dat$nmat <- nmat
 dat$choice_models <- choice_models
 dat$age_models <- age_models
 
-#Construct distance matrix for levels of experience
-expmat <- matrix(nrow = 20, ncol = 20)
+dat$expmat <- matrix(nrow = 20, ncol = 20)
 for (i in 1:20) {
-  for (j in 1:20)
-    expmat[i,j] <- abs(i-j)
+  for (j in 1:20) {
+    dat$expmat[i,j] <- abs(i-j)
+  }
 }
-
-dat$expmat <- expmat
 
 library(rethinking)
 library(scales)
@@ -67,7 +65,7 @@ m <- extract.samples(m7)
 dd <- c()
 for (i in 1:20) {
   dd[i] <- inv_logit(mean(m$mean_sigma) + mean(m$dev_sigma[,i]))
-  
+
 }
 
 
