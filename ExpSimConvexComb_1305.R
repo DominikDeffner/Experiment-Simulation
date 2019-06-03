@@ -154,7 +154,7 @@ library(truncnorm)
 
        # Make sigma change with experience in group
 
-       sigma_Ind <- sigma_Ind*exp(-0.1 * (Result$Experience[which(Result$id==x & Result$trial==i)]-1))
+       sigma_Ind <- sigma_Ind*exp(-0.05 * (Result$Experience[which(Result$id==x & Result$trial==i)]-1))
 
 
        #Get other current group members
@@ -370,14 +370,14 @@ library(truncnorm)
  Result <- Sim_fct(Tmax=100,               #Number of trials
                    Group_size=4,
                    N_group=2,
-                   N_sessions=10,
+                   N_sessions=15,
                    L=0.2,                   #Noise of coices, impact determined by size of payoff
                    Payoff_Better=13,
                    Payoff_Worse=10,
                    Hard_SD = 3,
                    Easy_SD = 1.5,
-                   phi=0.5,                 #Updating parameter; weight of recent choices
-                   sigma=0.7,               #Reliance on SL
+                   phi=0.2,                 #Updating parameter; weight of recent choices
+                   sigma=0,               #Reliance on SL
                    kappa=0.6,                 #Relative weight of comformity and age bias, as kappa -> 1 more weight on conformity
                    f=3,                     #strength of conformity bias
                    b=0.2)                     #strength of age bias

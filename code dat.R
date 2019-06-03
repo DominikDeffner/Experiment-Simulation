@@ -34,15 +34,24 @@ dat$nmat <- nmat
 dat$choice_models <- choice_models
 dat$age_models <- age_models
 
+#Construct distance matrix for levels of experience
+expmat <- matrix(nrow = 20, ncol = 20)
+for (i in 1:20) {
+  for (j in 1:20)
+    expmat[i,j] <- abs(i-j)
+}
+
+dat$expmat <- expmat
+
 library(rethinking)
 library(scales)
 
 
 m0 <- stan( file="ewa_model1.stan" , data=dat , chains=1 )
 
-m1 <- stan( file="ewa_model2.stan" , data=dat , chains=1, iter = 500 )
+m1 <- stan( file="ewa_model2.stan" , data=dat , chains=1, iter = 500 )  #now with social cues
 
-m2 <- stan( file="ewa_model3.stan" , data=dat , chains=1, iter = 500 )
+m2 <- stan( file="ewa_model3.stan" , data=dat , chains=1, iter = 500 )  #convex combination of age and frequency
 
 m3 <- stan( file="ewa_model4.stan" , data=dat , chains=1, iter = 500 )
 
@@ -50,7 +59,19 @@ m5 <- stan( file="ewa_model5.stan" , data=dat , chains=1, iter = 500 )
 
 m6 <- stan( file="ewa_model6.stan" , data=dat , chains=1, iter = 1000 )
 
-sum <- precis(m6, depth = 3)
-plot(inv_logit(sum$mean[3:22]), type="l", ylim=c(0,1), ylab=expression(sigma), xlab="Experience", lwd=2)
-polygon(c(1:20,20:1), c(inv_logit(sum$`94.5%`[3:22]), rev(inv_logit(sum$`5.5%`[3:22]))), col=alpha("blue",alpha = 0.2), border = NA, ylim=c(0,1))
-curve(0.7 *exp(-0.1*(x-1)), 1,20, ylim=c(0,1), add = TRUE, lty=2, ylab = "", xlab = "", lwd=2)
+m7 <- stan( file="ewa_model7.stan" , data=dat , chains=1, iter = 2000 )
+
+
+
+m <- extract.samples(m7)
+dd <- c()
+for (i in 1:20) {
+  dd[i] <- inv_logit(mean(m$mean_sigma) + mean(m$dev_sigma[,i]))
+  
+}
+
+
+
+plot(dd, type="l", ylim=c(0,1), ylab=expression(sigma), xlab="Experience", lwd=2)
+#polygon(c(1:20,20:1), c(inv_logit(sum$`94.5%`[3:22]), rev(inv_logit(sum$`5.5%`[3:22]))), col=alpha("blue",alpha = 0.2), border = NA, ylim=c(0,1))
+curve(0.9 *exp(-0.05*(x-1)), 1,20, ylim=c(0,1), add = TRUE, lty=2, ylab = "", xlab = "", lwd=2)

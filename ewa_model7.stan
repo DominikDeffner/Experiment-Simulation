@@ -61,6 +61,7 @@ model{
 
 matrix[N_id,4] A; // attraction matrix
 matrix[20,20] Kmat; // Covariance matrix for parameters
+int N_mat;
 
 mean_sigma ~ normal(0,1);
 phi ~ beta(2,2);
@@ -72,10 +73,21 @@ beta ~ normal(0,0.5);
 rhosq ~ exponential( 0.5 );
 etasq ~ exponential( 2 );
 
+//Gaussian process fun
 
+N_mat = dims(expmat)[1];
 
-Kmat = cov_GPL2(expmat, etasq, rhosq, 0.01);
-dev_sigma ~ multi_normal( rep_vector(0,20) , Kmat );
+for (i in 1:(N_mat-1)) {
+  Kmat[i, i] = sq_alpha + 0.01;
+  for (j in (i + 1):N_mat) {
+    Kmat[i, j] = sq_alpha * exp(-sq_rho * square(expmat[i,j]) );
+    Kmat[j, i] = Kmat[i, j];
+  }
+}
+Kmat[N_mat, N_mat] = sq_alpha + 0.01;
+
+//Kmat = cov_GPL2(expmat, etasq, rhosq, 0.01);
+dev_sigma ~ multi_normal( rep_vector(0,20) , Kmat);
 
 
 // initialize attraction scores
