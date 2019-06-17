@@ -1,4 +1,3 @@
-
 //Try to add varying effects on GP
 
 functions{
@@ -35,7 +34,10 @@ int n2[N];
 int n3[N];
 int n4[N];
 
+//Frequency of each option chosen
 matrix[N,4] nmat;
+
+//Experience distance matrix
 matrix[20,20] expmat;
 
 // age vars
@@ -54,9 +56,11 @@ real beta;                         // strength of age bias
 real mean_sigma; // mean weight of social info for average level of experience
 
 //Gaussian process stuff
-real etasq;   // max covariance in Gaussian process
-real rhosq;   // rate of decline
-real sigmasq; // additional variance of main diagonal
+real log_etasq;   // max covariance in Gaussian process
+real log_rhosq;   // rate of decline
+real log_sigmasq; // additional variance of main diagonal
+
+matrix[N_id, 20] dev_sigma;   // Average deviations for levels of experience
 
 // Varying effects clustered on individual
 matrix[4,N_id] z_GP;
@@ -74,15 +78,14 @@ cholesky_factor_corr[4] Rho_ID;
 transformed parameters{
 
   matrix[N_id,4] v_GP; // varying effects on stuff
-
   v_GP = ( diag_pre_multiply( sigma_ID , Rho_ID ) * z_GP )';
+
 }
 
 model{
-matrix[N_id, 20] dev_sigma;         // Average deviations for levels of experience
 
 matrix[N_id,4] A; // attraction matrix
-matrix[20, 20] Kmat[N_id];
+matrix[20, 20] Kmat[N_id];  // Array of N_id 20 x 20 matrices to store person specific covariances
 
 mean_sigma ~ normal(0,1);
 phi ~ beta(2,2);
@@ -90,9 +93,9 @@ L ~ exponential(1);
 f ~ normal(1,0.5);
 kappa ~ beta(2,2);
 beta ~ normal(0,0.5);
-rhosq ~ exponential( 0.5 );
-etasq ~ exponential( 2 );
-sigmasq ~ exponential(2);
+log_rhosq ~ normal(0,1.5);
+log_etasq ~ normal(0,1.5);
+log_sigmasq ~ normal(0,1.5);
 
 //varying effects
 to_vector(z_GP) ~ normal(0,1);
@@ -100,8 +103,9 @@ sigma_ID ~ exponential(1);
 Rho_ID ~ lkj_corr_cholesky(4);
 
 for ( i in 1:N_id) {
-    Kmat[i] = cov_GPL2(expmat, (etasq + v_GP[i,2]) , (rhosq + v_GP[i,3]), (sigmasq + v_GP[i,4]));
-    dev_sigma[i,] ~ multi_normal( rep_vector(0,20) , Kmat[i]);
+   Kmat[i] = cov_GPL2(expmat, exp(log_etasq + v_GP[i,2]) , exp(log_rhosq + v_GP[i,3]), exp(log_sigmasq + v_GP[i,4]));
+
+    dev_sigma[i,] ~ multi_normal(rep_vector(0,20) , Kmat[i]);
 }
 
 // initialize attraction scores

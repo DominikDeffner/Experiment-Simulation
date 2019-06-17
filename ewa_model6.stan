@@ -42,7 +42,6 @@ parameters{
   // [1:20] logit_sigma
   // [21] logit_phi
   // [22] log_L
-  // [23:42] beta
 
     matrix[22,N_id] z_ind;
     vector<lower=0>[22] sigma_ind; // standard deviation of parameter values among individuals

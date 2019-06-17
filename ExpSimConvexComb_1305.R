@@ -37,7 +37,10 @@ library(truncnorm)
 
    Homunculi$L <-     rtruncnorm(8, a=0, b=+Inf, mean=L, sd=0.05)
    Homunculi$phi <-   rtruncnorm(8, a=0, b=1, mean=phi, sd=0.1)
-   Homunculi$sigma <- rtruncnorm(8, a=0, b=1, mean=sigma, sd=0.1)
+   
+   Homunculi$sigma[1:4] <- rtruncnorm(4, a=0, b=1, mean=sigma, sd=0)
+   Homunculi$sigma[5:8] <- rtruncnorm(4, a=0, b=1, mean=sigma-0.5, sd=0)
+   
    Homunculi$f <-     rtruncnorm(8, a=0, b=+Inf, mean=f, sd=0.5)
    Homunculi$b <-     rtruncnorm(8, a=-Inf, b=+Inf, mean=b, sd=0.1)
 
@@ -153,9 +156,13 @@ library(truncnorm)
 
 
        # Make sigma change with experience in group
-
-       sigma_Ind <- sigma_Ind*exp(-0.05 * (Result$Experience[which(Result$id==x & Result$trial==i)]-1))
-
+       if (x %in% c(1:4)){
+       sigma_Ind <- sigma_Ind*exp(-1 * (Result$Experience[which(Result$id==x & Result$trial==i)]-1))
+       } else {
+        sigma_Ind <- sigma_Ind*exp(-0.01 * (Result$Experience[which(Result$id==x & Result$trial==i)]-1))
+       }
+       
+      f_Ind <-  f_Ind*exp(-1 * (Result$Experience[which(Result$id==x & Result$trial==i)]-1)) + 1
 
        #Get other current group members
        Group_members <- Homunculi$id[which(Homunculi$Group == Homunculi$Group[which(Homunculi$id == x)] & Homunculi$id != x)]
@@ -370,14 +377,14 @@ library(truncnorm)
  Result <- Sim_fct(Tmax=100,               #Number of trials
                    Group_size=4,
                    N_group=2,
-                   N_sessions=15,
+                   N_sessions=10,
                    L=0.2,                   #Noise of coices, impact determined by size of payoff
                    Payoff_Better=13,
                    Payoff_Worse=10,
                    Hard_SD = 3,
                    Easy_SD = 1.5,
                    phi=0.2,                 #Updating parameter; weight of recent choices
-                   sigma=0,               #Reliance on SL
+                   sigma=0.9,               #Reliance on SL
                    kappa=0.6,                 #Relative weight of comformity and age bias, as kappa -> 1 more weight on conformity
                    f=3,                     #strength of conformity bias
                    b=0.2)                     #strength of age bias
