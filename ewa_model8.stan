@@ -1,4 +1,4 @@
-//Try to add varying effects on GP
+// Gaussian process on sigma with varying effects
 
 functions{
     matrix cov_GPL2(matrix x, real sq_alpha, real sq_rho, real sq_sigma) {
@@ -93,9 +93,9 @@ L ~ exponential(1);
 f ~ normal(1,0.5);
 kappa ~ beta(2,2);
 beta ~ normal(0,0.5);
-log_rhosq ~ normal(0,1.5);
-log_etasq ~ normal(0,1.5);
-log_sigmasq ~ normal(0,1.5);
+log_rhosq ~ normal(-2,1);
+log_etasq ~ normal(-1,1);
+log_sigmasq ~ normal(-1,1);
 
 //varying effects
 to_vector(z_GP) ~ normal(0,1);

@@ -1,5 +1,5 @@
 
-// Attempt at simplest Gaussian process
+// Gaussian process on sigma
 
 functions{
 

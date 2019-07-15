@@ -1,4 +1,4 @@
-// convex combo of conformity + age bias
+// Social Learning with frequency and experience bias
 
 data{
 int N;

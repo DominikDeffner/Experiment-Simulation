@@ -1,4 +1,4 @@
-//GP + varying effects on sigma, beta, f and kappa
+// Full Gaussian process model with varying effects
 
 
 //Function for Gaussian process kernel

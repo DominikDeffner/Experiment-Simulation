@@ -1,5 +1,4 @@
-// convex combo of conformity + age bias
-// now social learning varies by Experience (time in region)
+// Individual (unpooled) estimates for different levels of experience
 
 data{
   int N;
@@ -53,7 +52,6 @@ transformed parameters{
 model{
 
   matrix[N_id,4] A; // attraction matrix
-  vector[20] delta_sigma_container;
 
   phi ~ beta(2,2);
   L ~ exponential(1);
